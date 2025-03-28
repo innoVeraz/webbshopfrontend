@@ -36,7 +36,17 @@ export const fetchProducts = async () => {
   
     return response.json();
   }
-  
 
-  
-  
+  export async function getCustomerByEmail(email: string) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/customers/email/${email}`);
+    if (response.status === 404) {
+      return null;
+    }
+    if (!response.ok) {
+      throw new Error("Kunde inte söka efter kund");
+    }
+    return response.json();
+  }
+
+
+

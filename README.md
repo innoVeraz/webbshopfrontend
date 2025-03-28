@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# E-shop Frontend
 
-## Getting Started
+Detta är frontend-delen av e-handelsapplikationen, byggd med Next.js, TypeScript och Tailwind CSS.
 
-First, run the development server:
+## Förutsättningar
+
+- Node.js (version 18 eller senare)
+- npm eller yarn
+- Backend-API:et måste vara igång (se backend-projektets README)
+
+## Installation
+
+1. Klona projektet
+```bash
+git clone <repository-url>
+cd webbshopfrontend
+```
+
+2. Installera dependencies
+```bash
+npm install
+# eller
+yarn install
+```
+
+3. Skapa en .env.local fil i projektets rot med följande innehåll:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
+
+## Starta utvecklingsservern
 
 ```bash
 npm run dev
-# or
+# eller
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Applikationen kommer nu vara tillgänglig på [http://localhost:3001](http://localhost:3001)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Funktioner
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Produktlistning
+- Varukorg
+- Checkout med Stripe integration
+- Orderbekräftelse
+- Kundhantering
 
-## Learn More
+## Struktur
 
-To learn more about Next.js, take a look at the following resources:
+- `/src/app` - Next.js app router och huvudkomponenter
+- `/src/components` - Återanvändbara komponenter
+- `/lib` - Tjänster och utilities
+- `/public` - Statiska filer
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## För utvecklare
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Viktig information
 
-## Deploy on Vercel
+- Stripe är konfigurerat i testläge
+- För att testa betalningar, använd Stripes test-kort:
+  - Kortnummer: 4242 4242 4242 4242
+  - Utgångsdatum: Valfritt framtida datum
+  - CVC: Valfri tresiffrig kod
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Kända begränsningar
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Backend-API:et måste vara igång för att frontend ska fungera
+- Stripe webhooks måste vara korrekt konfigurerade för full funktionalitet
+
+### Testa webhooks lokalt
+
+För att testa Stripe webhooks lokalt behöver du:
+
+1. Installera Stripe CLI
+2. Kör följande kommando:
+```bash
+stripe listen --forward-to localhost:3000/stripe/webhook
+```
+
+## Scripts
+
+- `npm run dev` - Starta utvecklingsservern
+- `npm run build` - Bygg projektet
+- `npm start` - Starta produktionsservern
+- `npm run lint` - Kör linting

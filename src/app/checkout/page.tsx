@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useCart } from "../context/cart-context";
-import { createCustomer } from "../../../lib/api";
+import { createCustomer, getCustomerByEmail } from "../../../lib/api";
 import { Order } from "../types/order";
 import { createOrder } from "../../../lib/order-service";
 import { createStripeCheckoutSession } from "../../../lib/stripe-service";
@@ -57,8 +57,18 @@ export default function Checkout() {
     }
 
     try {
-      const customerResponse = await createCustomer(formData);
-      const customer_id = customerResponse.id;
+      // Kontrollera om kunden redan finns
+      let customer_id;
+      const existingCustomer = await getCustomerByEmail(formData.email);
+      
+      if (existingCustomer) {
+        customer_id = existingCustomer.id;
+      } else {
+        // Skapa ny kund om den inte finns
+        const customerResponse = await createCustomer(formData);
+        customer_id = customerResponse.id;
+      }
+
       const orderItems = cart.map((item) => {
         if (!item.id) {
           throw new Error(`Product ID is missing for item: ${item.name}`);
