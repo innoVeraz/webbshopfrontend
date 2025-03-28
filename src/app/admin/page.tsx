@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { Order } from "@/app/types/order";
 import { fetchOrders, updateOrder, deleteOrder } from "../../../lib/order-service";
-import Button from "@/app/components/ui/button";
-import { Check, Trash2 } from "lucide-react";
 
 export default function Admin() {
   const [orders, setOrders] = useState<Order[]>([]);

@@ -1,16 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchOrder } from "../../../lib/api";
-import { useRouter } from "next/navigation";
-import { Order } from "../../../types/order";
+import { fetchOrder } from "../../../../lib/order-service";
+import { Order } from "@/app/types/order";
 import Image from "next/image";
 
 export default function OrderPage({ params }: { params: { id: string } }) {
-  const [order, setOrder] = useState<Order | null>(null);
+  const [order, setOrder] = useState<Order| null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+
 
   useEffect(() => {
     fetchOrder(Number(params.id))
@@ -32,9 +31,9 @@ export default function OrderPage({ params }: { params: { id: string } }) {
       <h2 className="text-xl font-bold mt-4">Produkter:</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {order.order_items.map((item) => (
-          <div key={item.id} className="border p-4 rounded-md">
+          <div key={item.product_id} className="border p-4 rounded-md">
             <Image
-              src={`${process.env.NEXT_PUBLIC_API_URL}/public/product-placeholder.jpg`} // 🔥 Lägg in rätt bild här
+              src={`${process.env.NEXT_PUBLIC_API_URL}/public/product-placeholder.jpg`}
               alt={item.product_name}
               width={100}
               height={100}

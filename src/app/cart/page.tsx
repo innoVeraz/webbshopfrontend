@@ -1,13 +1,11 @@
 "use client";
 
 import { useCart } from "../context/cart-context";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function CartPage() {
   const { cart, clearCart, updateQuantity } = useCart();
-
 
   const totalPrice = cart.reduce((sum, item) => sum + item.quantity * item.price, 0);
 
@@ -33,28 +31,33 @@ export default function CartPage() {
                 <div className="flex-1">
                   <h2 className="font-semibold">{product.name}</h2>
                   <p className="text-gray-600">{product.price} SEK</p>
-                  <div className="flex items-center mt-2">
-                    <Button variant="outline" onClick={() => updateQuantity(product.id!, product.quantity - 1)}>
-                      -
-                    </Button>
-                    <span className="mx-2">{product.quantity}</span>
-                    <Button variant="outline" onClick={() => updateQuantity(product.id!, product.quantity + 1)}>
-                      +
-                    </Button>
-                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    className="btn btn-sm"
+                    onClick={() => updateQuantity(product.id!, Math.max(1, (product.quantity ?? 1) - 1))}
+                  >
+                    -
+                  </button>
+                  <span className="mx-2">{product.quantity}</span>
+                  <button
+                    className="btn btn-sm"
+                    onClick={() => updateQuantity(product.id!, product.quantity + 1)}
+                  >
+                    +
+                  </button>
                 </div>
               </div>
             ))}
           </div>
-
-          <div className="mt-6 flex justify-between items-center border-t pt-4">
-            <p className="text-xl font-bold">Total: {totalPrice} SEK</p>
-            <div className="flex gap-4">
-              <Button variant="outline" onClick={clearCart}>
-                Töm varukorg
-              </Button>
-              <Link href="/checkout">
-                <Button>Gå till kassan</Button>
+          <div className="mt-4 flex justify-between items-center">
+            <button className="btn btn-error" onClick={clearCart}>
+              Töm varukorg
+            </button>
+            <div>
+              <p className="text-xl font-bold">Totalt: {totalPrice} SEK</p>
+              <Link href="/checkout" className="btn btn-primary mt-2">
+                Gå till kassan
               </Link>
             </div>
           </div>
