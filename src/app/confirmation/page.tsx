@@ -16,49 +16,36 @@ export default function ConfirmationPage() {
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
+        // Get payment_id (session_id) from URL
         const session_id = searchParams.get('session_id');
-        const order_id = searchParams.get('order_id');
-        const lastOrderId = order_id || localStorage.getItem('lastOrderId');
-
-        if (!session_id || !lastOrderId) {
-          throw new Error('Orderinformation saknas. Kontrollera din orderhistorik eller kontakta kundtjänst.');
+        if (!session_id) {
+          throw new Error('Ingen betalningsinformation hittades');
         }
 
-        try {
-          await updateOrder(parseInt(lastOrderId), {
-            payment_status: "paid",
-            payment_id: session_id,
-            order_status: "received"
-          });
-        } catch (updateError) {
-          console.error('Kunde inte uppdatera orderstatusen:', updateError);
-
-        }
-
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${lastOrderId}`);
+        // Fetch order details using payment_id
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/payment/${session_id}`);
         if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('Ordern kunde inte hittas. Kontrollera din orderhistorik eller kontakta kundtjänst.');
-          }
-          throw new Error('Ett fel uppstod när orderinformationen skulle hämtas. Vänligen försök igen.');
+          throw new Error('Kunde inte hämta orderinformation');
         }
 
         const orderData = await response.json();
-        if (!orderData) {
-          throw new Error('Ingen orderinformation hittades.');
-        }
+        
+        // Update order status
+        await updateOrder(orderData.id, {
+          payment_status: "paid",
+          payment_id: session_id,
+          order_status: "received"
+        });
 
         setOrder(orderData);
+        
+        // Clear cart and stored form data
         clearCart();
         localStorage.removeItem('checkoutForm');
         localStorage.removeItem('lastOrderId');
-
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('Ett oväntat fel uppstod. Vänligen kontakta kundtjänst.');
-        }
+        
+      } catch (err: any) {
+        setError(err.message || 'Något gick fel');
       } finally {
         setLoading(false);
       }
@@ -129,7 +116,7 @@ export default function ConfirmationPage() {
               </thead>
               <tbody>
                 {order.order_items.map((item) => (
-                  <tr key={item.product_id}>
+                  <tr key={item.id}>
                     <td>{item.product_name}</td>
                     <td>{item.quantity}</td>
                     <td>{item.unit_price} kr</td>

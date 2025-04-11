@@ -2,16 +2,16 @@
 
 import { useState } from "react";
 import { useCart } from "../context/cart-context";
-import { createCustomer, getCustomerByEmail } from "../../../lib/api";
+import { useRouter } from "next/navigation";
+import { createCustomer } from "../../../lib/api";
 import { Order } from "../types/order";
 import { createOrder } from "../../../lib/order-service";
 import { createStripeCheckoutSession } from "../../../lib/stripe-service";
 import Image from "next/image";
 
-
 export default function Checkout() {
-  const { cart, updateQuantity, removeFromCart } = useCart();
-
+  const { cart, clearCart, updateQuantity, removeFromCart } = useCart();
+  const router = useRouter();
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
@@ -26,7 +26,9 @@ export default function Checkout() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPayment, setShowPayment] = useState(false);
 
+  // Spara kundformulär i localStorage
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => {
@@ -36,6 +38,7 @@ export default function Checkout() {
     });
   };
 
+  // Ladda formulärdata från localStorage vid sidladdning
   useState(() => {
     const savedForm = localStorage.getItem('checkoutForm');
     if (savedForm) {
@@ -57,29 +60,17 @@ export default function Checkout() {
     }
 
     try {
-      // Kontrollera om kunden redan finns
-      let customer_id;
-      const existingCustomer = await getCustomerByEmail(formData.email);
-      
-      if (existingCustomer) {
-        customer_id = existingCustomer.id;
-      } else {
-        // Skapa ny kund om den inte finns
-        const customerResponse = await createCustomer(formData);
-        customer_id = customerResponse.id;
-      }
+      // Skapa kund
+      const customerResponse = await createCustomer(formData);
+      const customer_id = customerResponse.id;
 
-      const orderItems = cart.map((item) => {
-        if (!item.id) {
-          throw new Error(`Product ID is missing for item: ${item.name}`);
-        }
-        return {
-          product_id: item.id,
-          product_name: item.name,
-          quantity: item.quantity,
-          unit_price: item.price,
-        };
-      });
+      // Förbered orderdata
+      const orderItems = cart.map((item) => ({
+        product_id: item.id,
+        product_name: item.name,
+        quantity: item.quantity,
+        unit_price: item.price,
+      }));
 
       const orderData: Order = {
         id: 0,
@@ -92,14 +83,15 @@ export default function Checkout() {
         order_items: orderItems,
       };
 
+      // Skapa order
       const orderResponse = await createOrder(orderData);
       console.log('Order created:', orderResponse);
       
-
+      // Skapa Stripe Checkout session
       const stripeItems = cart.map(item => ({
         name: item.name,
         quantity: item.quantity,
-        price: item.price, 
+        price: item.price, // Konverteras till ören/cents i stripe-service
       }));
 
       console.log('Creating Stripe session for order:', orderResponse.id);
@@ -108,22 +100,19 @@ export default function Checkout() {
         items: stripeItems,
       });
 
+      // Spara order ID och redirect
       localStorage.setItem('lastOrderId', orderResponse.id.toString());
       console.log('Redirecting to Stripe:', checkoutUrl);
       window.location.href = checkoutUrl;
       
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("Order failed:", error);
-        setError(error.message || "Något gick fel vid skapande av order");
-      } else {
-        console.error("Order failed:", error);
-        setError("Ett okänt fel inträffade");
-      }
+    } catch (error: any) {
+      console.error("Order failed:", error);
+      setError(error?.message || "Något gick fel vid skapande av order");
       setLoading(false);
     }
   };
 
+  // Visa inget om varukorgen är tom
   if (cart.length === 0) {
     return (
       <div className="container mx-auto p-4 text-center">
@@ -136,6 +125,8 @@ export default function Checkout() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Kassa</h1>
+      
+      {/* Varukorg */}
       <div className="bg-base-100 rounded-lg shadow-lg p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">Din varukorg</h2>
         <div className="space-y-4">
@@ -158,20 +149,20 @@ export default function Checkout() {
               <div className="flex items-center gap-2">
                 <button 
                   className="btn btn-circle btn-sm"
-                  onClick={() => updateQuantity(item.id!, Math.max(1, item.quantity - 1))}
+                  onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
                 >
                   -
                 </button>
                 <span className="w-8 text-center">{item.quantity}</span>
                 <button 
                   className="btn btn-circle btn-sm"
-                  onClick={() => updateQuantity(item.id!, item.quantity + 1)}
+                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
                 >
                   +
                 </button>
                 <button 
                   className="btn btn-error btn-sm ml-2"
-                  onClick={() => removeFromCart(item.id!)}
+                  onClick={() => removeFromCart(item.id)}
                 >
                   Ta bort
                 </button>
@@ -183,6 +174,8 @@ export default function Checkout() {
           </div>
         </div>
       </div>
+
+      {/* Kundformulär */}
       <form onSubmit={handleOrderSubmit} className="space-y-6">
         <div className="bg-base-100 rounded-lg shadow-lg p-6">
           <h2 className="text-xl font-semibold mb-4">Dina uppgifter</h2>

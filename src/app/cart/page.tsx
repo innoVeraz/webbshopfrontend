@@ -1,6 +1,7 @@
 "use client";
 
 import { useCart } from "../context/cart-context";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -35,14 +36,14 @@ export default function CartPage() {
                 <div className="flex items-center gap-2">
                   <button
                     className="btn btn-sm"
-                    onClick={() => updateQuantity(product.id!, Math.max(1, (product.quantity ?? 1) - 1))}
+                    onClick={() => updateQuantity(product.id, Math.max(1, product.quantity - 1))}
                   >
                     -
                   </button>
                   <span className="mx-2">{product.quantity}</span>
                   <button
                     className="btn btn-sm"
-                    onClick={() => updateQuantity(product.id!, product.quantity + 1)}
+                    onClick={() => updateQuantity(product.id, product.quantity + 1)}
                   >
                     +
                   </button>

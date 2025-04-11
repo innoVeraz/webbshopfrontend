@@ -7,7 +7,7 @@ export async function createStripeCheckoutSession(orderData: {
   }>;
 }) {
   try {
-    console.log('Creating Stripe session with:', {
+    console.log('Attempting to create Stripe session with:', {
       orderData,
       url: `${process.env.NEXT_PUBLIC_API_URL}/stripe/create-checkout`
     });
@@ -22,10 +22,10 @@ export async function createStripeCheckoutSession(orderData: {
         items: orderData.items.map(item => ({
           name: item.name,
           quantity: item.quantity,
-          unit_amount: Math.round(item.price * 100),
+          unit_amount: Math.round(item.price * 100), // Konvertera till ören/cents som Stripe förväntar sig
           currency: 'sek'
         })),
-        success_url: `${window.location.origin}/confirmation?session_id={CHECKOUT_SESSION_ID}&order_id=${orderData.orderId}`,
+        success_url: `${window.location.origin}/confirmation?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${window.location.origin}/checkout`
       }),
     });
@@ -37,11 +37,12 @@ export async function createStripeCheckoutSession(orderData: {
         statusText: response.statusText,
         errorText
       });
-      throw new Error(`Could not create Stripe checkout session: ${response.status} ${errorText}`);
+      throw new Error(`Kunde inte skapa Stripe checkout session: ${response.status} ${errorText}`);
     }
 
     const data = await response.json();
     console.log('Stripe session created successfully:', data);
+
     return { url: data.url, sessionId: data.sessionId };
   } catch (error) {
     console.error('Error in createStripeCheckoutSession:', error);

@@ -1,33 +1,32 @@
 'use client';
 
 import { Product } from "../types/product";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import Image from "next/image";
 import { useCart } from "../context/cart-context";
 
 export const ProductCard = ({ product }: { product: Product }) => {
     const { addToCart } = useCart();
   return (
-    <Card className="w-full max-w-sm border">
-      <CardHeader>
-        <h3 className="text-lg font-bold">{product.name}</h3>
-      </CardHeader>
-      <CardContent className="space-y-2">
-      <Image
-  src={`${process.env.NEXT_PUBLIC_API_URL}/public/${product.image}`}
-  alt={product.name}
-  width={300}
-  height={300}
-  className="rounded"
-  unoptimized
-/>
-
-        <p className="text-sm text-gray-600">{product.description}</p>
-        <p className="font-bold">{product.price} SEK</p>
-      </CardContent>
-      <CardFooter>
-        <button className="btn btn-neutral" onClick={() => addToCart(product)}> Lägg i varukorg </button>
-      </CardFooter>
-    </Card>
+    <div className="card bg-base-100 shadow-sm h-full">
+      <figure className="px-4 pt-4">
+        <div className="w-full h-[140px] relative">
+          <Image
+            src={`${process.env.NEXT_PUBLIC_API_URL}/public/${product.image}`}
+            alt={product.name}
+            fill
+            className="object-contain rounded-xl"
+            unoptimized
+          />
+        </div>
+      </figure>
+      <div className="card-body p-4">
+        <h2 className="card-title text-base">{product.name}</h2>
+        <p className="text-sm line-clamp-2">{product.description}</p>
+        <p className="text-lg font-bold">{product.price} SEK</p>
+        <div className="card-actions justify-end mt-auto pt-2">
+          <button className="btn btn-primary w-full" onClick={() => addToCart(product)}>Lägg i varukorg</button>
+        </div>
+      </div>
+    </div>
   );
 };

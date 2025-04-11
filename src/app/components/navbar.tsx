@@ -26,14 +26,24 @@ export default function Navbar() {
                   <li><Link href="/category/kids">Kids</Link></li>
                 </ul>
               </details>
-              <details>
-                <summary>Admin</summary>
-                <ul className="p-2">
-                <li><Link href="/product-import">Product import</Link></li>
-            <li><Link href="/admin">Orders</Link></li>
-                </ul>
-              </details>
               </div>
+      <div className="navbar-start">
+
+        <div className="dropdown md:hidden">
+          <label tabIndex={0} className="">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" />
+            </svg>
+          </label>
+          <ul tabIndex={0} className="flex menu menu-sm dropdown-content mt-3 z-[10] p-2 shadow bg-base-100 rounded-box w-52">
+            <li><Link href="/products">Products</Link></li>
+            <li><Link href="/shop">Shop</Link></li>
+            <li><Link href="/admin">Admin</Link></li>
+          </ul>
+        </div>
+
+      </div>
+      {/* Navbar End - Cart Icon */}
       <div className="navbar-end">
         <Link href="/cart" className="btn btn-ghost btn-circle">
           <div className="indicator flex space-between">

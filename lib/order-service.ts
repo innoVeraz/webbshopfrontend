@@ -2,7 +2,7 @@ import { Order } from "@/app/types/order";
   
 export async function createOrder(order: Order) {
   const formattedOrder = {
-    customer_id: order.customer_id, // ✅ Skickar bara ID, inte hela objektet
+    customer_id: order.customer_id, 
     payment_status: order.payment_status,
     payment_id: order.payment_id,
     order_status: order.order_status,
@@ -47,7 +47,7 @@ export const fetchOrder = async (orderId: number): Promise<Order> => {
 
 export const updateOrder = async (orderId: number, updates: Partial<Order>) => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}`, {
-    method: "PATCH",
+    method: "PUT",
     headers: { 
       "Content-Type": "application/json" 
     },
