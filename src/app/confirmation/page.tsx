@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Order } from '../types/order';
 import { useCart } from '../context/cart-context';
-import { updateOrder } from '../../../lib/order-service';
 
 export default function ConfirmationPage() {
   const [order, setOrder] = useState<Order | null>(null);
@@ -29,21 +28,15 @@ export default function ConfirmationPage() {
         }
 
         const orderData = await response.json();
-        
-        // Update order status
-        await updateOrder(orderData.id, {
-          payment_status: "paid",
-          payment_id: session_id,
-          order_status: "received"
-        });
 
+        // Ta bort onödig uppdatering av order - webhook hanterar detta
         setOrder(orderData);
-        
+
         // Clear cart and stored form data
         clearCart();
         localStorage.removeItem('checkoutForm');
         localStorage.removeItem('lastOrderId');
-        
+
       } catch (err: any) {
         setError(err.message || 'Något gick fel');
       } finally {
