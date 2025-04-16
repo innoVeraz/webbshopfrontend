@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "../context/cart-context";
 import { createCustomer } from "../../../lib/api";
 import { Order } from "../types/order";
@@ -24,24 +24,38 @@ export default function Checkout() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  // Set isClient to true once the component mounts
+  useEffect(() => {
+    setIsClient(true);
+    
+    // Load saved form data
+    const savedForm = localStorage.getItem('checkoutForm');
+    if (savedForm) {
+      try {
+        setFormData(JSON.parse(savedForm));
+      } catch (err) {
+        console.error("Error parsing saved form data:", err);
+      }
+    }
+    
+    return () => {
+      // Cleanup if needed
+    };
+  }, []);
 
   // Spara kundformulär i localStorage
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => {
       const newData = { ...prev, [name]: value };
-      localStorage.setItem('checkoutForm', JSON.stringify(newData));
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('checkoutForm', JSON.stringify(newData));
+      }
       return newData;
     });
   };
-
-  // Ladda formulärdata från localStorage vid sidladdning
-  useState(() => {
-    const savedForm = localStorage.getItem('checkoutForm');
-    if (savedForm) {
-      setFormData(JSON.parse(savedForm));
-    }
-  });
 
   const totalPrice = cart.reduce((sum, item) => sum + item.quantity * item.price, 0);
 
@@ -63,7 +77,7 @@ export default function Checkout() {
 
       // Förbered orderdata
       const orderItems = cart.map((item) => ({
-        product_id: item.id ?? 0, // Use nullish coalescing to provide a default value
+        product_id: item.id ?? 0, 
         product_name: item.name,
         quantity: item.quantity,
         unit_price: item.price,
@@ -88,7 +102,7 @@ export default function Checkout() {
       const stripeItems = cart.map(item => ({
         name: item.name,
         quantity: item.quantity,
-        price: item.price, // Konverteras till ören/cents i stripe-service
+        price: item.price,
       }));
 
       console.log('Creating Stripe session for order:', orderResponse.id);
@@ -98,9 +112,11 @@ export default function Checkout() {
       });
 
       // Spara order ID och redirect
-      localStorage.setItem('lastOrderId', orderResponse.id.toString());
-      console.log('Redirecting to Stripe:', checkoutUrl);
-      window.location.href = checkoutUrl;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('lastOrderId', orderResponse.id.toString());
+        console.log('Redirecting to Stripe:', checkoutUrl);
+        window.location.href = checkoutUrl;
+      }
       
     } catch (error: unknown) {
       console.error("Order failed:", error);
@@ -108,6 +124,11 @@ export default function Checkout() {
       setLoading(false);
     }
   };
+
+  // Don't render anything during SSR
+  if (!isClient) {
+    return <div className="container mx-auto p-4 text-center">Laddar...</div>;
+  }
 
   // Visa inget om varukorgen är tom
   if (cart.length === 0) {

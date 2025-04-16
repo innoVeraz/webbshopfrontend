@@ -1,18 +1,22 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Order } from '../types/order';
 import { useCart } from '../context/cart-context';
 
-export default function ConfirmationPage() {
+// Create a separate component that uses useSearchParams
+function ConfirmationContent() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
   const searchParams = useSearchParams();
   const { clearCart } = useCart();
 
   useEffect(() => {
+    setIsClient(true);
+    
     const fetchOrderDetails = async () => {
       try {
         // Get payment_id (session_id) from URL
@@ -34,8 +38,10 @@ export default function ConfirmationPage() {
 
         // Clear cart and stored form data
         clearCart();
-        localStorage.removeItem('checkoutForm');
-        localStorage.removeItem('lastOrderId');
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('checkoutForm');
+          localStorage.removeItem('lastOrderId');
+        }
 
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Något gick fel');
@@ -44,8 +50,19 @@ export default function ConfirmationPage() {
       }
     };
 
-    fetchOrderDetails();
-  }, [searchParams, clearCart]);
+    if (isClient) {
+      fetchOrderDetails();
+    }
+  }, [searchParams, clearCart, isClient]);
+
+  // Don't render anything during SSR
+  if (!isClient) {
+    return (
+      <div className="container mx-auto p-4 text-center">
+        <p>Laddar...</p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -128,5 +145,19 @@ export default function ConfirmationPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Main page component that wraps the content in a Suspense boundary
+export default function ConfirmationPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto p-4 text-center">
+        <div className="loading loading-spinner loading-lg"></div>
+        <p>Hämtar orderinformation...</p>
+      </div>
+    }>
+      <ConfirmationContent />
+    </Suspense>
   );
 }

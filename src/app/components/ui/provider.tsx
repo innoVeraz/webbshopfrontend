@@ -1,5 +1,11 @@
-import { ChakraProvider } from "@chakra-ui/react";
+"use client";
+
+import React from "react";
 
 export function Provider({ children }: { children: React.ReactNode }) {
-  return <ChakraProvider>{children}</ChakraProvider>;
+  return (
+    <div className="min-h-screen bg-base-100">
+      {children}
+    </div>
+  );
 }
