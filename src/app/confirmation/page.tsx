@@ -37,8 +37,8 @@ export default function ConfirmationPage() {
         localStorage.removeItem('checkoutForm');
         localStorage.removeItem('lastOrderId');
 
-      } catch (err: any) {
-        setError(err.message || 'Något gick fel');
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Något gick fel');
       } finally {
         setLoading(false);
       }
@@ -109,7 +109,7 @@ export default function ConfirmationPage() {
               </thead>
               <tbody>
                 {order.order_items.map((item) => (
-                  <tr key={item.id}>
+                  <tr key={`${item.product_id}-${item.product_name}`}>
                     <td>{item.product_name}</td>
                     <td>{item.quantity}</td>
                     <td>{item.unit_price} kr</td>

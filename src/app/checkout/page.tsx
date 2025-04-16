@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useCart } from "../context/cart-context";
-import { useRouter } from "next/navigation";
 import { createCustomer } from "../../../lib/api";
 import { Order } from "../types/order";
 import { createOrder } from "../../../lib/order-service";
@@ -10,8 +9,7 @@ import { createStripeCheckoutSession } from "../../../lib/stripe-service";
 import Image from "next/image";
 
 export default function Checkout() {
-  const { cart, clearCart, updateQuantity, removeFromCart } = useCart();
-  const router = useRouter();
+  const { cart, updateQuantity, removeFromCart } = useCart();
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
@@ -26,7 +24,6 @@ export default function Checkout() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showPayment, setShowPayment] = useState(false);
 
   // Spara kundformulär i localStorage
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,7 +63,7 @@ export default function Checkout() {
 
       // Förbered orderdata
       const orderItems = cart.map((item) => ({
-        product_id: item.id,
+        product_id: item.id ?? 0, // Use nullish coalescing to provide a default value
         product_name: item.name,
         quantity: item.quantity,
         unit_price: item.price,
@@ -105,9 +102,9 @@ export default function Checkout() {
       console.log('Redirecting to Stripe:', checkoutUrl);
       window.location.href = checkoutUrl;
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Order failed:", error);
-      setError(error?.message || "Något gick fel vid skapande av order");
+      setError(error instanceof Error ? error.message : "Något gick fel vid skapande av order");
       setLoading(false);
     }
   };
@@ -131,7 +128,7 @@ export default function Checkout() {
         <h2 className="text-xl font-semibold mb-4">Din varukorg</h2>
         <div className="space-y-4">
           {cart.map((item) => (
-            <div key={item.id} className="flex items-center gap-4 p-4 bg-base-200 rounded-lg">
+            <div key={item.id || Math.random()} className="flex items-center gap-4 p-4 bg-base-200 rounded-lg">
               {item.image && (
                 <Image
                   src={`${process.env.NEXT_PUBLIC_API_URL}/public${item.image}`}
@@ -149,20 +146,20 @@ export default function Checkout() {
               <div className="flex items-center gap-2">
                 <button 
                   className="btn btn-circle btn-sm"
-                  onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                  onClick={() => item.id !== undefined && updateQuantity(item.id, Math.max(1, item.quantity - 1))}
                 >
                   -
                 </button>
                 <span className="w-8 text-center">{item.quantity}</span>
                 <button 
                   className="btn btn-circle btn-sm"
-                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                  onClick={() => item.id !== undefined && updateQuantity(item.id, item.quantity + 1)}
                 >
                   +
                 </button>
                 <button 
                   className="btn btn-error btn-sm ml-2"
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => item.id !== undefined && removeFromCart(item.id)}
                 >
                   Ta bort
                 </button>

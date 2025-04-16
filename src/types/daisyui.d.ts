@@ -1,4 +1,4 @@
 declare module 'daisyui' {
-  const plugin: any;
+  const plugin: unknown;
   export default plugin;
 }
