@@ -8,13 +8,13 @@ export const ProductCard = ({ product }: { product: Product }) => {
     const { addToCart } = useCart();
   return (
     <div className="card bg-base-100 shadow-sm h-full">
-      <figure className="px-4 pt-4">
-        <div className="w-full h-[140px] relative">
+      <figure className="">
+        <div className="w-full h-[180px] sm:h-[300px] relative">
           <Image
             src={`${process.env.NEXT_PUBLIC_API_URL}/public/${product.image}`}
             alt={product.name}
             fill
-            className="object-contain rounded-xl"
+            className=" pb-2"
             unoptimized
           />
         </div>
