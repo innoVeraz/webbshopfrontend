@@ -15,8 +15,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
             alt={product.name}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-            className=" pb-2"
-            
+            className="pb-2"
           />
         </div>
       </figure>
