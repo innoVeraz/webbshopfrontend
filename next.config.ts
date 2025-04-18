@@ -9,7 +9,12 @@ const nextConfig: NextConfig = {
         port: "3000",
         pathname: "/public/**",
       },
-      new URL('https://webbshopbackend.vercel.app/public/**')
+      {
+        protocol: "https",
+        hostname: "webbshopbackend.vercel.app",
+        port: "",
+        pathname: "/public/**",
+      }
     ],
   },
 };
