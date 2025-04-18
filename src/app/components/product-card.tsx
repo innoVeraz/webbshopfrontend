@@ -15,7 +15,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
             alt={product.name}
             fill
             className=" pb-2"
-            unoptimized
+            optimized
           />
         </div>
       </figure>
