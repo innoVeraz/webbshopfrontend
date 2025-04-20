@@ -5,12 +5,16 @@ import { fetchProducts } from "../../lib/api";
 import { Product } from "./types/product";
 import { ProductCard } from "./components/product-card";
 import Link from "next/link";
+import { SearchBar } from "./components/search-bar";
+import { SearchResults } from "./components/search-result";
+import { useSearch } from "@/hooks/use-search";
+
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('');
   const [sortOrder, setSortOrder] = useState('latest');
+  const { state } = useSearch();
 
   useEffect(() => {
     const userToken = localStorage.getItem('userToken');
@@ -23,14 +27,12 @@ export default function Home() {
     }
   }, []);
 
-  // Filtrera och sortera produkter
-  const filteredProducts = products
-    .filter(product => !selectedCategory || product.category === selectedCategory)
-    .sort((a, b) => {
-      if (sortOrder === 'price-low') return a.price - b.price;
-      if (sortOrder === 'price-high') return b.price - a.price;
-      return 0;
-    });
+  // Sortera produkter
+  const sortedProducts = products.sort((a, b) => {
+    if (sortOrder === 'price-low') return a.price - b.price;
+    if (sortOrder === 'price-high') return b.price - a.price;
+    return 0;
+  });
 
   return (
     <main className="min-h-screen">
@@ -49,16 +51,10 @@ export default function Home() {
                   Upptäck vårt breda sortiment av kvalitetsprodukter för alla tillfällen
                 </p>
                 <div className="space-x-4">
-                  <Link 
-                    href="/login" 
-                    className="inline-block bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors duration-200"
-                  >
+                  <Link href="/login" className="inline-block bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors duration-200">
                     Logga in
                   </Link>
-                  <Link 
-                    href="/register" 
-                    className="inline-block border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors duration-200"
-                  >
+                  <Link href="/register" className="inline-block border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors duration-200">
                     Skapa konto
                   </Link>
                 </div>
@@ -67,22 +63,13 @@ export default function Home() {
           </div>
         </section>
       )}
-      
+
       {isLoggedIn && (
         <section className="container mx-auto px-6 py-12">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-3xl font-bold">Våra produkter</h2>
             <div className="flex space-x-4">
-              <select 
-                className="select select-bordered w-full max-w-xs"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-              >
-                <option value="">Alla kategorier</option>
-                <option value="women">Women</option>
-                <option value="men">Men</option>
-                <option value="kids">Kids</option>
-              </select>
+              <SearchBar />
               <select 
                 className="select select-bordered w-full max-w-xs"
                 value={sortOrder}
@@ -94,11 +81,16 @@ export default function Home() {
               </select>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+
+          {state.query && state.results.length > 0 ? (
+            <SearchResults results={state.results} />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {sortedProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          )}
         </section>
       )}
     </main>

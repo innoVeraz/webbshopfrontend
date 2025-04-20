@@ -5,6 +5,7 @@ import { fetchProducts } from "../../../lib/api";
 import { Product } from "../types/product";
 import { ProductCard } from "../components/product-card";
 import { useRouter } from "next/navigation";
+import { SearchBar } from "../components/search-bar";
 
 export default function ShopPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -50,7 +51,8 @@ export default function ShopPage() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Shop</h1>
         <div className="flex space-x-4">
-          <select 
+          <SearchBar />
+          {/* <select 
             className="select select-bordered w-full max-w-xs"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -59,7 +61,7 @@ export default function ShopPage() {
             <option value="women">Women</option>
             <option value="men">Men</option>
             <option value="kids">Kids</option>
-          </select>
+          </select> */}
           <select 
             className="select select-bordered w-full max-w-xs"
             value={sortOrder}
