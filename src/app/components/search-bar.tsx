@@ -1,13 +1,13 @@
-import { useSearch } from "@/hooks/use-search";
+import { useSearch } from "@/app/context/search-context";
 
 export const SearchBar = () => {
   const { state, setQuery, fetchSearchResults } = useSearch();
-
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     fetchSearchResults(state.query);
   };
-
+  
   return (
     <form onSubmit={handleSubmit}>
       <label className="input">

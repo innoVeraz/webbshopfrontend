@@ -15,18 +15,15 @@ export default function CategoryPage() {
   const params = useParams();
   const category = params.slug as string;
 
-  // Mark as client-side rendered
+ 
   useEffect(() => {
     setIsClient(true);
-    
-    // Check authentication
     const userToken = localStorage.getItem('userToken');
     if (!userToken) {
       router.push('/login');
     } else {
       setIsAuthenticated(true);
-      
-      // Fetch products only when authenticated
+
       fetchProducts()
         .then(allProducts => {
           const filteredProducts = allProducts.filter(
@@ -44,8 +41,6 @@ export default function CategoryPage() {
     men: 'Men',
     kids: 'Kids'
   };
-
-  // Don't render anything during SSR
   if (!isClient) {
     return (
       <div className="container mx-auto px-6 py-8">
@@ -55,8 +50,6 @@ export default function CategoryPage() {
       </div>
     );
   }
-
-  // Show loading when authenticating or fetching products
   if (isAuthenticated === null || loading) {
     return (
       <div className="container mx-auto px-6 py-8">
@@ -68,15 +61,13 @@ export default function CategoryPage() {
   }
 
   return (
-    <main className="container mx-auto px-6 py-8">
+    <main className="container mx-auto sm:px-6 sm:py-8">
       <h1 className="text-3xl font-bold mb-8">{categoryTitles[category] || category}</h1>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 auto-rows-fr">
         {products.map((product) => (
           <ProductCard key={product.id || Math.random()} product={product} />
         ))}
       </div>
-
       {products.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-600">Inga produkter hittades i denna kategori.</p>

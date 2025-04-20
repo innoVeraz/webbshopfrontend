@@ -49,32 +49,22 @@ export default function ShopPage() {
   return (
     <main className="container mx-auto px-6 py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Shop</h1>
+      <SearchBar />
         <div className="flex space-x-4">
-          <SearchBar />
-          {/* <select 
-            className="select select-bordered w-full max-w-xs"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            <option value="">Alla kategorier</option>
-            <option value="women">Women</option>
-            <option value="men">Men</option>
-            <option value="kids">Kids</option>
-          </select> */}
+       
           <select 
             className="select select-bordered w-full max-w-xs"
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
           >
-            <option value="latest">Senaste</option>
-            <option value="price-low">Pris: Lågt till högt</option>
-            <option value="price-high">Pris: Högt till lågt</option>
+            <option value="latest">Price</option>
+            <option value="price-low">Low to High</option>
+            <option value="price-high">High to Low</option>
           </select>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {filteredProducts.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}

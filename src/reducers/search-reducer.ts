@@ -1,6 +1,13 @@
+export type SearchResult = {
+  title: string;
+  link: string;
+  snippet: string;
+  displayLink?: string;
+};
+
 export type SearchState = {
   query: string;
-  results: string[];
+  results: SearchResult[];
   loading: boolean;
   error: string | null;
 };
@@ -8,7 +15,7 @@ export type SearchState = {
 export type SearchAction =
   | { type: "SET_QUERY"; payload: string }
   | { type: "FETCH_START" }
-  | { type: "FETCH_SUCCESS"; payload: string[] }
+  | { type: "FETCH_SUCCESS"; payload: SearchResult[] }
   | { type: "FETCH_ERROR"; payload: string };
 
 export const initialSearchState: SearchState = {

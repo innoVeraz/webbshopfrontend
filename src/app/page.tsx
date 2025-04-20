@@ -6,9 +6,7 @@ import { Product } from "./types/product";
 import { ProductCard } from "./components/product-card";
 import Link from "next/link";
 import { SearchBar } from "./components/search-bar";
-import { SearchResults } from "./components/search-result";
-import { useSearch } from "@/hooks/use-search";
-
+import { useSearch } from "./context/search-context";
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -27,7 +25,25 @@ export default function Home() {
     }
   }, []);
 
-  // Sortera produkter
+  const searchResultsAsProducts: Product[] = state.results.map((result: any, index) => ({
+    id: `search-${index}`,
+    name: result.title,
+    description: result.snippet,
+    price: 0,
+    stock: 0,
+    category: "search",
+    image: "black.jpg",
+    imageUrl: result.imageUrl,
+    link: result.link,
+    displayLink: result.displayLink,
+    isSearchResult: true,
+    externalPrice: result.price ? {
+      value: result.price.value,
+      currency: result.price.currency
+    } : undefined,
+    productId: result.productId
+  }));
+
   const sortedProducts = products.sort((a, b) => {
     if (sortOrder === 'price-low') return a.price - b.price;
     if (sortOrder === 'price-high') return b.price - a.price;
@@ -63,13 +79,11 @@ export default function Home() {
           </div>
         </section>
       )}
-
       {isLoggedIn && (
         <section className="container mx-auto px-6 py-12">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold">Våra produkter</h2>
+          <SearchBar />
             <div className="flex space-x-4">
-              <SearchBar />
               <select 
                 className="select select-bordered w-full max-w-xs"
                 value={sortOrder}
@@ -81,11 +95,20 @@ export default function Home() {
               </select>
             </div>
           </div>
+          {state.loading && <div className="text-center py-4">Söker...</div>}
+          {state.error && <div className="text-red-500 py-4">Error: {state.error}</div>}
 
           {state.query && state.results.length > 0 ? (
-            <SearchResults results={state.results} />
+            <>
+              <p className="mb-4 text-xl">Sökresultat för: <span className="font-semibold">"{state.query}"</span></p>
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {searchResultsAsProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            </>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {sortedProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
