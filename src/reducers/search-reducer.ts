@@ -3,6 +3,12 @@ export type SearchResult = {
   link: string;
   snippet: string;
   displayLink?: string;
+  imageUrl?: string;
+  price?: {
+    value: number;
+    currency: string;
+  };
+  productId?: string;
 };
 
 export type SearchState = {

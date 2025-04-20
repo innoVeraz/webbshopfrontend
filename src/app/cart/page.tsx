@@ -35,14 +35,14 @@ export default function CartPage() {
                 <div className="flex items-center gap-2">
                   <button
                     className="btn btn-sm"
-                    onClick={() => product.id !== undefined && updateQuantity(product.id, Math.max(1, product.quantity - 1))}
+                    onClick={() => product.id !== undefined && updateQuantity(Number(product.id), Math.max(1, product.quantity - 1))}
                   >
                     -
                   </button>
                   <span className="mx-2">{product.quantity}</span>
                   <button
                     className="btn btn-sm"
-                    onClick={() => product.id !== undefined && updateQuantity(product.id, product.quantity + 1)}
+                    onClick={() => product.id !== undefined && updateQuantity(Number(product.id), product.quantity + 1)}
                   >
                     +
                   </button>

@@ -8,20 +8,6 @@ import Link from "next/link";
 import { SearchBar } from "./components/search-bar";
 import { useSearch } from "./context/search-context";
 
-// Define the search result type
-interface SearchResult {
-  title: string;
-  snippet: string;
-  imageUrl?: string;
-  link: string;
-  displayLink: string;
-  price?: {
-    value: number;
-    currency: string;
-  };
-  productId?: string;
-}
-
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -39,22 +25,19 @@ export default function Home() {
     }
   }, []);
 
-  const searchResultsAsProducts: Product[] = state.results.map((result: SearchResult, index) => ({
+  const searchResultsAsProducts: Product[] = state.results.map((result, index) => ({
     id: `search-${index}`,
     name: result.title,
     description: result.snippet,
     price: 0,
     stock: 0,
     category: "search",
-    image: "black.jpg",
+    image: result.imageUrl || "black.jpg", // Always provide a string
     imageUrl: result.imageUrl,
     link: result.link,
-    displayLink: result.displayLink,
+    displayLink: result.displayLink || '',
     isSearchResult: true,
-    externalPrice: result.price ? {
-      value: result.price.value,
-      currency: result.price.currency
-    } : undefined,
+    externalPrice: result.price,
     productId: result.productId
   }));
 

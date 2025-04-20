@@ -3,7 +3,6 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { Product } from "../types/product";
 
-
 interface CartProduct extends Product {
   quantity: number;
 }
@@ -33,16 +32,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addToCart = (product: Product) => {
     setCart((prevCart) => {
-      const existingProduct = prevCart.find((p) => p.id === product.id);
+      const existingProduct = prevCart.find((p) => String(p.id) === String(product.id));
       if (existingProduct) {
         return prevCart.map((p) =>
-          p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p
+          String(p.id) === String(product.id) ? { ...p, quantity: p.quantity + 1 } : p
         );
       }
       return [...prevCart, { ...product, quantity: 1 }];
     });
   };
-
 
   const updateQuantity = (id: number, quantity: number) => {
     if (quantity <= 0) {
@@ -50,15 +48,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return;
     }
     setCart((prevCart) =>
-      prevCart.map((p) => (p.id === id ? { ...p, quantity } : p))
+      prevCart.map((p) => (String(p.id) === String(id) ? { ...p, quantity } : p))
     );
   };
 
-
   const removeFromCart = (id: number) => {
-    setCart((prevCart) => prevCart.filter((p) => p.id !== id));
+    setCart((prevCart) => prevCart.filter((p) => String(p.id) !== String(id)));
   };
-
 
   const clearCart = () => {
     setCart([]);

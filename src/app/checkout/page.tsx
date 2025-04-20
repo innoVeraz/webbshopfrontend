@@ -26,11 +26,9 @@ export default function Checkout() {
   const [error, setError] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
 
-  // Set isClient to true once the component mounts
   useEffect(() => {
     setIsClient(true);
-    
-    // Load saved form data
+  
     const savedForm = localStorage.getItem('checkoutForm');
     if (savedForm) {
       try {
@@ -41,11 +39,9 @@ export default function Checkout() {
     }
     
     return () => {
-      // Cleanup if needed
     };
   }, []);
 
-  // Spara kundformulär i localStorage
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => {
@@ -71,13 +67,13 @@ export default function Checkout() {
     }
 
     try {
-      // Skapa kund
+
       const customerResponse = await createCustomer(formData);
       const customer_id = customerResponse.id;
 
-      // Förbered orderdata
+  
       const orderItems = cart.map((item) => ({
-        product_id: item.id ?? 0, 
+        product_id: Number(item.id || 0), 
         product_name: item.name,
         quantity: item.quantity,
         unit_price: item.price,
@@ -94,27 +90,20 @@ export default function Checkout() {
         order_items: orderItems,
       };
 
-      // Skapa order
       const orderResponse = await createOrder(orderData);
-      console.log('Order created:', orderResponse);
       
-      // Skapa Stripe Checkout session
       const stripeItems = cart.map(item => ({
         name: item.name,
         quantity: item.quantity,
         price: item.price,
       }));
 
-      console.log('Creating Stripe session for order:', orderResponse.id);
       const { url: checkoutUrl } = await createStripeCheckoutSession({
         orderId: orderResponse.id,
         items: stripeItems,
       });
 
-      // Spara order ID och redirect
       if (typeof window !== 'undefined') {
-        localStorage.setItem('lastOrderId', orderResponse.id.toString());
-        console.log('Redirecting to Stripe:', checkoutUrl);
         window.location.href = checkoutUrl;
       }
       
@@ -125,12 +114,10 @@ export default function Checkout() {
     }
   };
 
-  // Don't render anything during SSR
   if (!isClient) {
     return <div className="container mx-auto p-4 text-center">Laddar...</div>;
   }
 
-  // Visa inget om varukorgen är tom
   if (cart.length === 0) {
     return (
       <div className="container mx-auto p-4 text-center">
@@ -143,8 +130,6 @@ export default function Checkout() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Kassa</h1>
-      
-      {/* Varukorg */}
       <div className="bg-base-100 rounded-lg shadow-lg p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">Din varukorg</h2>
         <div className="space-y-4">
@@ -167,20 +152,20 @@ export default function Checkout() {
               <div className="flex items-center gap-2">
                 <button 
                   className="btn btn-circle btn-sm"
-                  onClick={() => item.id !== undefined && updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                  onClick={() => item.id !== undefined && updateQuantity(Number(item.id), Math.max(1, item.quantity - 1))}
                 >
                   -
                 </button>
                 <span className="w-8 text-center">{item.quantity}</span>
                 <button 
                   className="btn btn-circle btn-sm"
-                  onClick={() => item.id !== undefined && updateQuantity(item.id, item.quantity + 1)}
+                  onClick={() => item.id !== undefined && updateQuantity(Number(item.id), item.quantity + 1)}
                 >
                   +
                 </button>
                 <button 
                   className="btn btn-error btn-sm ml-2"
-                  onClick={() => item.id !== undefined && removeFromCart(item.id)}
+                  onClick={() => item.id !== undefined && removeFromCart(Number(item.id))}
                 >
                   Ta bort
                 </button>

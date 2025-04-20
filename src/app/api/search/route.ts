@@ -32,10 +32,13 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (error: Error) {
-    console.error('Search API route error:', error.message);
+  } catch (error: unknown) {
+    console.error('Search API route error:', error instanceof Error ? error.message : 'Unknown error');
     return NextResponse.json(
-      { error: 'Failed to fetch search results', details: error.message },
+      { 
+        error: 'Failed to fetch search results', 
+        details: error instanceof Error ? error.message : 'Unknown error' 
+      },
       { status: 500 }
     );
   }
