@@ -33,9 +33,10 @@ export const SearchProvider = ({ children }: { children: ReactNode }) => {
         console.error('Results is not an array:', results);
         dispatch({ type: 'FETCH_ERROR', payload: 'Invalid response format' });
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Search context error:', err);
-      dispatch({ type: 'FETCH_ERROR', payload: err.message || 'Något gick fel' });
+      const errorMessage = err instanceof Error ? err.message : 'Något gick fel';
+      dispatch({ type: 'FETCH_ERROR', payload: errorMessage });
     }
   };
 

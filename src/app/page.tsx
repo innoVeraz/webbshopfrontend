@@ -8,6 +8,20 @@ import Link from "next/link";
 import { SearchBar } from "./components/search-bar";
 import { useSearch } from "./context/search-context";
 
+// Define the search result type
+interface SearchResult {
+  title: string;
+  snippet: string;
+  imageUrl?: string;
+  link: string;
+  displayLink: string;
+  price?: {
+    value: number;
+    currency: string;
+  };
+  productId?: string;
+}
+
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -25,7 +39,7 @@ export default function Home() {
     }
   }, []);
 
-  const searchResultsAsProducts: Product[] = state.results.map((result: any, index) => ({
+  const searchResultsAsProducts: Product[] = state.results.map((result: SearchResult, index) => ({
     id: `search-${index}`,
     name: result.title,
     description: result.snippet,
@@ -82,7 +96,7 @@ export default function Home() {
       {isLoggedIn && (
         <section className="container mx-auto px-6 py-12">
           <div className="flex justify-between items-center mb-8">
-          <SearchBar />
+            <SearchBar />
             <div className="flex space-x-4">
               <select 
                 className="select select-bordered w-full max-w-xs"
@@ -100,7 +114,7 @@ export default function Home() {
 
           {state.query && state.results.length > 0 ? (
             <>
-              <p className="mb-4 text-xl">Sökresultat för: <span className="font-semibold">"{state.query}"</span></p>
+              <p className="mb-4 text-xl">Sökresultat för: <span className="font-semibold">&quot;{state.query}&quot;</span></p>
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {searchResultsAsProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />

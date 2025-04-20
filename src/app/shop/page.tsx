@@ -9,7 +9,7 @@ import { SearchBar } from "../components/search-bar";
 
 export default function ShopPage() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory] = useState('');
   const [sortOrder, setSortOrder] = useState('latest');
   const [loading, setLoading] = useState(true);
   const router = useRouter();

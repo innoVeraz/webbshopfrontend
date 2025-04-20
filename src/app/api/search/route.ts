@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json();
     return NextResponse.json(data);
-  } catch (error: any) {
+  } catch (error: Error) {
     console.error('Search API route error:', error.message);
     return NextResponse.json(
       { error: 'Failed to fetch search results', details: error.message },
