@@ -10,23 +10,21 @@ export const ProductCard = ({ product }: { product: Product }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
   
-  // Check if this is a search result
   const isSearchResult = 'isSearchResult' in product && product.isSearchResult;
-  
-  // Determine the image source to use
+
   const imageSource = isSearchResult && product.imageUrl && !imageError 
     ? product.imageUrl 
     : `${process.env.NEXT_PUBLIC_API_URL}/public/${product.image}`;
   
   const handleImageClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent click from bubbling up to parent
+    e.stopPropagation(); 
     if (isSearchResult && product.link) {
       window.open(product.link, '_blank');
     }
   };
   
   const handleButtonClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent click from bubbling up to parent
+    e.stopPropagation(); 
     addToCart(product);
   };
   
@@ -47,7 +45,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
     >
       <figure className="">
         <div 
-          className={`w-full h-[180px] relative ${isSearchResult ? 'cursor-pointer' : ''}`}
+          className={`w-full sm:h-[200px] md:h-[300px] relative ${isSearchResult ? 'cursor-pointer' : ''}`}
           onClick={handleImageClick}
         >
           {isSearchResult && product.imageUrl && !imageError ? (
@@ -56,7 +54,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
               alt={product.name}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-              className="pb-2 object-cover"
+              className="pb-2 object-fit-cover"
               onError={handleImageError}
               unoptimized={isSearchResult} 
             />
@@ -65,7 +63,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
               src={`${process.env.NEXT_PUBLIC_API_URL}/public/${product.image}`}
               alt={product.name}
               fill
-              className="pb-2 object-cover"
+              className="pb-2 object-fit-cover"
             />
           )}
           {isSearchResult && (

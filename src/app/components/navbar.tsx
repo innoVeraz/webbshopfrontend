@@ -43,7 +43,6 @@ export default function Navbar() {
         </div>
 
       </div>
-      {/* Navbar End - Cart Icon */}
       <div className="navbar-end">
         <Link href="/cart" className="btn btn-ghost btn-circle">
           <div className="indicator flex space-between">

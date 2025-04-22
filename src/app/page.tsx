@@ -32,7 +32,7 @@ export default function Home() {
     price: 0,
     stock: 0,
     category: "search",
-    image: result.imageUrl || "black.jpg", // Always provide a string
+    image: result.imageUrl || "black.jpg", 
     imageUrl: result.imageUrl,
     link: result.link,
     displayLink: result.displayLink || '',
